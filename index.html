@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Input Form</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Office JavaScript API -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+    <style>
+        /* Using a clean, modern font */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Style for readonly inputs to make them look disabled */
+        input:read-only {
+            background-color: #4A5568; /* A slightly darker gray */
+            cursor: not-allowed;
+        }
+        /* Styles for the custom message modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-box {
+            background-color: #2D3748; /* bg-gray-800 */
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 280px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.visible .modal-box {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-white p-2 text-xs">
+    <div id="app-container">
+        <h1 class="text-base font-bold mb-2 text-center text-gray-100">Add New Record</h1>
+        
+        <!-- Input Form -->
+        <form id="data-form" class="space-y-1.5" autocomplete="off">
+            <div>
+                <label for="co-no" class="block text-xs font-medium text-gray-300 mb-0.5">C.O. No.</label>
+                <input type="text" id="co-no" autocomplete="off" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+            </div>
+
+            <div>
+                <label for="sr-ref" class="block text-xs font-medium text-gray-300 mb-0.5">S.R. Ref#</label>
+                <select id="sr-ref" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="company-name" class="block text-xs font-medium text-gray-300 mb-0.5">Name of Company</label>
+                <input type="text" id="company-name" readonly class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+            </div>
+
+            <div>
+                <label for="sr-amount" class="block text-xs font-medium text-gray-300 mb-0.5">SR Amount</label>
+                <input type="number" id="sr-amount" placeholder="0.00" readonly class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+            </div>
+
+            <div>
+                <label for="si-no" class="block text-xs font-medium text-gray-300 mb-0.5">S.I. #</label>
+                <input type="text" id="si-no" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+            </div>
+
+            <div>
+                <label for="payment-status" class="block text-xs font-medium text-gray-300 mb-0.5">Status of Payment</label>
+                <select id="payment-status" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+                    <option>Paid</option>
+                    <option>Unpaid</option>
+                    <option>Pending</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="date-received" class="block text-xs font-medium text-gray-300 mb-0.5">Date Received</label>
+                <input type="date" id="date-received" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs">
+            </div>
+
+            <div>
+                <label for="remarks" class="block text-xs font-medium text-gray-300 mb-0.5">Remarks</label>
+                <textarea id="remarks" rows="2" class="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-1 px-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-xs"></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-1 flex space-x-2">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-blue-500 transition-colors duration-200 text-sm">
+                    Add Row
+                </button>
+                <button type="button" id="clear-btn" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-500 transition-colors duration-200 text-sm">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modern Message Modal -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="modal-icon" class="mb-3"></div>
+            <p id="modal-message" class="text-sm"></p>
+            <button id="modal-close-btn" class="mt-4 bg-blue-500 text-white py-1 px-4 rounded-md text-xs">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let sourceData = [];
+        let debounceTimeout = null; 
+
+        // --- Modal Elements ---
+        const messageModal = document.getElementById('message-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Excel) {
+                document.getElementById('date-received').valueAsDate = new Date();
+                loadSourceData();
+                setupTableChangeEventHandler();
+
+                const form = document.getElementById('data-form');
+                form.addEventListener('submit', handleFormSubmit);
+
+                const clearButton = document.getElementById('clear-btn');
+                clearButton.addEventListener('click', clearForm);
+
+                const coNoInput = document.getElementById('co-no');
+                coNoInput.addEventListener('input', updateSrRefSuggestions);
+
+                const srRefSelect = document.getElementById('sr-ref');
+                srRefSelect.addEventListener('change', autofillFromSrRef);
+
+                // Close modal when OK button is clicked
+                modalCloseBtn.addEventListener('click', () => {
+                    messageModal.classList.remove('visible');
+                });
+            }
+        });
+
+        /**
+         * Displays the modern message modal.
+         * @param {string} message The message to display.
+         * @param {'success' | 'warning' | 'error'} type The type of message.
+         */
+        function showMessage(message, type = 'info') {
+            modalMessage.textContent = message;
+            let iconSvg = '';
+            let iconColor = '';
+
+            switch (type) {
+                case 'success':
+                    iconColor = 'text-green-400';
+                    iconSvg = `<svg class="w-12 h-12 mx-auto ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    break;
+                case 'warning':
+                    iconColor = 'text-yellow-400';
+                    iconSvg = `<svg class="w-12 h-12 mx-auto ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+                    break;
+                case 'error':
+                    iconColor = 'text-red-400';
+                    iconSvg = `<svg class="w-12 h-12 mx-auto ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    break;
+            }
+            modalIcon.innerHTML = iconSvg;
+            messageModal.classList.add('visible');
+        }
+
+        async function setupTableChangeEventHandler() {
+            try {
+                await Excel.run(async (context) => {
+                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const sourceTable = sheet.tables.getItem("append_sr");
+                    sourceTable.onChanged.add(handleTableChange);
+                    await context.sync();
+                    console.log("Event handler for table changes has been set up.");
+                });
+            } catch (error) {
+                console.error("Could not set up table change event handler: " + error);
+            }
+        }
+
+        async function handleTableChange(event) {
+            console.log("Change detected in append_sr table. Reloading source data.");
+            await loadSourceData(); 
+        }
+
+        async function loadSourceData() {
+            try {
+                await Excel.run(async (context) => {
+                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const sourceTable = sheet.tables.getItem("append_sr");
+                    
+                    const dataRange = sourceTable.getDataBodyRange().load(["values"]);
+                    const headerRange = sourceTable.getHeaderRowRange().load("values");
+                    await context.sync();
+
+                    const headers = headerRange.values[0];
+                    const coNoIndex = headers.indexOf('co_no');
+                    const srRefIndex = headers.indexOf('I.D.');
+                    const companyIndex = headers.indexOf('name_of_company');
+                    const amountIndex = headers.indexOf('amount');
+
+                    if (coNoIndex === -1 || srRefIndex === -1 || companyIndex === -1 || amountIndex === -1) {
+                        console.error("Required columns missing in 'append_sr'.");
+                        showMessage("Required column missing in source table.", "error");
+                        return;
+                    }
+
+                    sourceData = dataRange.values.map(row => ({
+                        coNo: row[coNoIndex],
+                        srRef: row[srRefIndex],
+                        company: row[companyIndex],
+                        amount: row[amountIndex]
+                    }));
+                    console.log("Source data reloaded for autocomplete.");
+                });
+            } catch (error) {
+                console.error("Error loading source data: " + error);
+                showMessage("Error loading source data.", "error");
+            }
+        }
+
+        function updateSrRefSuggestions() {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                const coNoValue = document.getElementById('co-no').value.trim().toLowerCase();
+                const srRefDropdown = document.getElementById('sr-ref');
+                srRefDropdown.innerHTML = '<option value="">-- Select --</option>'; 
+
+                if (coNoValue.length === 0) return;
+
+                const matchingRows = sourceData.filter(row => 
+                    String(row.coNo).toLowerCase().includes(coNoValue)
+                );
+                
+                const uniqueSrRefs = new Set(matchingRows.map(row => row.srRef));
+
+                uniqueSrRefs.forEach(ref => {
+                    const option = document.createElement('option');
+                    option.value = ref;
+                    option.textContent = ref;
+                    srRefDropdown.appendChild(option);
+                });
+            }, 300); 
+        }
+
+        function autofillFromSrRef() {
+            const coNoValue = document.getElementById('co-no').value.trim();
+            const srRefValue = document.getElementById('sr-ref').value;
+            const companyInput = document.getElementById('company-name');
+            const amountInput = document.getElementById('sr-amount');
+
+            if (!srRefValue) {
+                companyInput.value = '';
+                amountInput.value = '';
+                return;
+            }
+
+            const matchingRecords = sourceData.filter(row => 
+                String(row.coNo) === coNoValue && 
+                String(row.srRef) === srRefValue
+            );
+
+            if (matchingRecords.length > 0) {
+                companyInput.value = matchingRecords[0].company;
+                const totalAmount = matchingRecords.reduce((sum, record) => {
+                    const amount = parseFloat(record.amount);
+                    return sum + (isNaN(amount) ? 0 : amount);
+                }, 0);
+                amountInput.value = totalAmount.toFixed(2);
+            }
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            addTableRow();
+        }
+        
+        async function addTableRow() {
+            try {
+                await Excel.run(async (context) => {
+                    const sheet = context.workbook.worksheets.getActiveWorksheet();
+                    const destinationTable = sheet.tables.getItem("tbl_ReceivingSI");
+
+                    const coNo = document.getElementById('co-no').value;
+                    const srRef = document.getElementById('sr-ref').value;
+
+                    const receivingHeaderRange = destinationTable.getHeaderRowRange().load("values");
+                    const receivingDataRange = destinationTable.getDataBodyRange().load("values");
+                    await context.sync();
+
+                    const receivingHeaders = receivingHeaderRange.values[0];
+                    const coNoColIndex = receivingHeaders.indexOf('C.O. No.');
+                    const srRefColIndex = receivingHeaders.indexOf('S.R. Ref#');
+
+                    if (coNoColIndex === -1 || srRefColIndex === -1) {
+                        showMessage("Key columns (C.O. No. or S.R. Ref#) not found in destination table.", "error");
+                        return;
+                    }
+
+                    const isDuplicate = receivingDataRange.values.some(row => 
+                        String(row[coNoColIndex]) === coNo && String(row[srRefColIndex]) === srRef
+                    );
+
+                    if (isDuplicate) {
+                        showMessage("Duplicate entry: This record already exists.", "warning");
+                        return;
+                    }
+
+                    const companyName = document.getElementById('company-name').value;
+                    const srAmount = parseFloat(document.getElementById('sr-amount').value) || 0;
+                    const siNo = document.getElementById('si-no').value;
+                    const paymentStatus = document.getElementById('payment-status').value;
+                    const dateReceived = document.getElementById('date-received').value;
+                    const remarks = document.getElementById('remarks').value;
+                    
+                    // Create the combined helper value
+                    const helperCoSrRef = `${coNo}:${srRef}`;
+
+                    const newRowData = [
+                        [coNo, srRef, companyName, srAmount, siNo, paymentStatus, dateReceived, remarks, helperCoSrRef, '']
+                    ];
+                    
+                    destinationTable.rows.add(null, newRowData);
+                    await context.sync();
+                    
+                    showMessage("Row added successfully!", "success");
+                    clearForm();
+                });
+            } catch (error) {
+                console.error(error); 
+                if (error instanceof OfficeExtension.Error && error.code === "InvalidArgument") {
+                     showMessage("Column count mismatch. Check destination table.", "error");
+                } else {
+                    showMessage("An unexpected error occurred.", "error");
+                }
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('data-form').reset();
+            document.getElementById('date-received').valueAsDate = new Date();
+            const srRefDropdown = document.getElementById('sr-ref');
+            srRefDropdown.innerHTML = '<option value="">-- Select --</option>';
+            document.getElementById('co-no').focus(); 
+        }
+    </script>
+</body>
+</html>
